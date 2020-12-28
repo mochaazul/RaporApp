@@ -1,0 +1,23 @@
+{
+  "name": "raporapp-server",
+  "version": "1.0.0",
+  "description": "ServerApp for rapor app client",
+  "main": "app.js",
+  "repository": "https://github.com/mochaazul/RaporApp.git",
+  "author": "Mochamad Zulfikar <mochaa.zulfikar@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev" : "nodemon app.js"
+  },
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.5"
+  }
+}
