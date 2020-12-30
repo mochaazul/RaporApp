@@ -1,6 +1,7 @@
 const express = require('express');
+const importRoutes = require('./importRoutes');
 const Routes = express.Router()
 
-Routes.get("/",(req,res)=>res.send('ini dari ruter'))
+Routes.use('/import',importRoutes)
 
 module.exports = Routes
