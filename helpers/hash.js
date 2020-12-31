@@ -1,9 +1,14 @@
 const bcrypt = require('bcrypt');
 
-export function makeHash(payload){
+function makeHash(payload){
     return bcrypt.hashSync(payload, +process.env.SALT || 10)
 }
 
-export function compareHash(payload,hashed) {
+function compareHash(payload,hashed) {
     return bcrypt.compareSync(payload, +process.env.SALT || 10)
+}
+
+module.exports = {
+    makeHash,
+    compareHash
 }
