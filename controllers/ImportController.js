@@ -50,11 +50,9 @@ class ImportController {
       return newobj
     })
 
-
     const result = await siswa.insertMany(dataSiswa, { ordered: true })
 
     res.status(200).json(result)
-
   }
 }
 
