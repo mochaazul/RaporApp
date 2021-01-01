@@ -15,19 +15,6 @@ class UserController {
     try {
       const id = req.params.id
       const data = await userDB.findOne({ _id: ObjectID(id) })
-
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'User tidak ditemukan.' })
-
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  static async findByName(req, res) {
-    try {
-      const { username } = req.params
-      const data = await userDB.findOne({ username })
-
       data ? res.status(200).json(data) : res.status(500).json({ err: 'User tidak ditemukan.' })
 
     } catch (err) {
