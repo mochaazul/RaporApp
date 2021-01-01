@@ -33,7 +33,6 @@ class WaliKelasController {
       const { nama } = req.params
       const walikelas = await wakelDB.find({ nama: new RegExp('^' + nama + '$', 'i') })
 
-      
       // if (!walikelas) throw { msg: 'Walikelas tidak ditemukan.', status: 400 }
       res.status(200).json(walikelas.toArray())
 
