@@ -1,13 +1,15 @@
+const Joi = require("joi")
+const { ObjectID } = require("mongodb")
+
 const pengumumanDB = require("../config/db").collection('pengumuman')
 
-// TODO INSERT Menggunakan id dari siapa yg create
 
 class PengumumanController {
 
   static async index(req, res, next) {
     try {
       let pengumuman = await pengumumanDB.find({}).toArray()
-      res.send(pengumuman)
+      res.status(200).json(pengumuman)
     } catch (err) {
       next(err)
     }
@@ -16,10 +18,11 @@ class PengumumanController {
   static async findById(req, res, next) {
     try {
       const id = req.params.id
-      const data = await pengumumanDB.findOne({ _id: ObjectID(id) })
+      const pengumuman = await pengumumanDB.findOne({ _id: ObjectID(id) })
 
-      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Pengumuman tidak ditemukan.', status: 400 })
+      if (!pengumuman) throw { msg: 'Pengumuman tidak ditemukan.', status: 400 }
 
+      res.status(200).json(pengumuman)
     } catch (err) {
       next(err)
     }
@@ -29,7 +32,7 @@ class PengumumanController {
   static async insert(req, res, next) {
     try {
       const { title, body } = req.body
-      // validation rules
+
       const schema = Joi.object({
         title: Joi.string()
           .required()
@@ -43,13 +46,15 @@ class PengumumanController {
           })
       })
 
-      let created_at = new Date().now()
 
+
+      let created_at = Date.now()
+      let created_by = req.loggedInUser.nama
       // validate input
       let validator = schema.validate({ title, body })
       if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
-      await pengumumanDB.insertOne({ title, body, created_at })
+      await pengumumanDB.insertOne({ title, body, created_at, created_by })
       res.status(200).json({ msg: "Pengumuman berhasil di tambahkan" })
 
     } catch (err) {
@@ -60,6 +65,7 @@ class PengumumanController {
 
   static async update(req, res, next) {
     try {
+      const { id } = req.params
       const { title, body } = req.body
       // validation rules
       const schema = Joi.object({
@@ -67,13 +73,16 @@ class PengumumanController {
         body: Joi.string()
       })
 
-      let updated_at = new Date().now()
+      console.log(id);
+
+      let updated_at = Date.now()
+      let updated_by = req.loggedInUser.nama
 
       // validate input
       let validator = schema.validate({ title, body })
       if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
-      await pengumumanDB.insertOne({ title, body, updated_at })
+      await pengumumanDB.findOneAndUpdate({ _id: ObjectID(id) }, { $set: { title, body, updated_at, updated_by } })
       res.status(200).json({ msg: "Pengumuman berhasil di perbaharui" })
 
     } catch (err) {
@@ -86,7 +95,7 @@ class PengumumanController {
       const id = req.params.id
       const data = await pengumumanDB.findOneAndDelete({ _id: ObjectID(id) })
       if (!data.value) throw ({ msg: "Pengumuman tidak ditemukan", status: 400 })
-      res.send(data)
+      res.status(200).json({msg:'Pengumuman berhasil di hapus', data:data.value})
     } catch (err) {
       next(err)
     }
