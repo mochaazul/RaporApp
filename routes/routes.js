@@ -11,7 +11,7 @@ const Routes = express.Router()
 Routes.use('/auth',authRoutes)
 
 // Rute di bawah ini menggunakan authentication middleware
-Routes.use(authentication)
+Routes.use([authentication,isAdmin])
 Routes.use('/import',importRoutes)
 Routes.use('/tapel',tahunPelajaranRoutes)
 Routes.use('/walikelas',walikelasRoutes)
