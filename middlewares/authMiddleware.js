@@ -11,8 +11,7 @@ async function authentication(req, res, next) {
 
     let decodedToken = { _id, username, nama, role } = decodeToken(access_token)
 
-
-    let user = await User.findOne({ _id: ObjectID(decodedToken.id) })
+    let user = await User.findOne({ _id: ObjectID(decodedToken._id) })
     if (!user) throw { msg: "Not authenticated", status: 401 }
 
     req.loggedInUser = user
