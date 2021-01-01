@@ -4,6 +4,7 @@ const WalikelasRoutes = express.Router()
 
 WalikelasRoutes.get('/',WaliKelasController.index)
 WalikelasRoutes.get('/:id', WaliKelasController.findById)
+WalikelasRoutes.get('/find/:name', WaliKelasController.findByName)
 WalikelasRoutes.post('/',WaliKelasController.insert)
 WalikelasRoutes.put("/:id",WaliKelasController.update)
 WalikelasRoutes.delete('/:id',WaliKelasController.delete)
