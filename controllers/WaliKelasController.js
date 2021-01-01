@@ -5,9 +5,13 @@ const wakelDB = require("../config/db").collection('waliKelas')
 
 class WaliKelasController {
 
-  static async index(req, res) {
-    let tapels = await wakelDB.find({}).toArray()
-    res.send(tapels)
+  static async index(req, res, next) {
+    try {
+      let tapels = await wakelDB.find({}).toArray()
+      res.send(tapels)      
+    } catch (err) {
+      next(err)
+    }
   }
 
   static async findById(req, res) {
@@ -15,25 +19,25 @@ class WaliKelasController {
       const id = req.params.id
       const data = await wakelDB.findOne({ _id: ObjectID(id) })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Wali kelas tidak ditemukan.' })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Wali kelas tidak ditemukan.', status: 400 })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
-  
-  static async findByName(req, res) {
+
+  static async findByName(req, res, next) {
     try {
       const { nama } = req.params
       const data = await wakelDB.findOne({ nama })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Walikelas tidak ditemukan.' })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Walikelas tidak ditemukan.', status: 400 })
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async insert(req, res) {
+  static async insert(req, res, next) {
     try {
       const { nama, kelas } = req.body
       // validation rules
@@ -52,22 +56,22 @@ class WaliKelasController {
 
       // validate input
       let validator = schema.validate({ nama, kelas })
-      if (validator.error) throw (validator.error.message)
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       // check if tapel exists
       let wakelExists = await wakelDB.findOne({ nama })
-      if (wakelExists) throw ({ msg: `Walikelas dengan nama ${nama} sudah ada dalam database` })
+      if (wakelExists) throw ({ msg: `Walikelas dengan nama ${nama} sudah ada dalam database`, status: 400 })
 
       await wakelDB.insertOne({ nama, kelas })
       res.status(200).json({ msg: "Walikelas berhasil di tambahkan" })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
 
   }
 
-  static async update(req, res) {
+  static async update(req, res, next) {
     try {
       const { nama } = req.body
       // validation rules
@@ -85,31 +89,31 @@ class WaliKelasController {
       })
 
       // validate input
-      let validator = schema.validate({ nama  })
-      if (validator.error) throw (validator.error.message)
+      let validator = schema.validate({ nama })
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       // check if tapel exists
       let wakelExists = await wakelDB.findOne({ nama })
-      if (wakelExists) throw ({ msg: `Walikelas dengan nama ${nama} sudah ada dalam database` })
-      
-      
+      if (wakelExists) throw ({ msg: `Walikelas dengan nama ${nama} sudah ada dalam database`, status: 400 })
+
+
 
       await wakelDB.insertOne({ nama })
       res.status(200).json({ msg: "Walikelas berhasil di tambahkan" })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     try {
       const id = req.params.id
       const data = await wakelDB.findOneAndDelete({ _id: ObjectID(id) })
-      if (!data.value) throw ({ msg: "Walikelas tidak ditemukan" })
+      if (!data.value) throw ({ msg: "Walikelas tidak ditemukan", status: 400 })
       res.send(data)
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 

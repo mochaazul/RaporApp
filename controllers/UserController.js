@@ -6,7 +6,7 @@ const userDB = require("../config/db").collection('users')
 
 class UserController {
 
-  static async index(req, res) {
+  static async index(req, res, next) {
     let users = await userDB.find({}).toArray()
     res.send(users)
   }
@@ -15,14 +15,14 @@ class UserController {
     try {
       const id = req.params.id
       const data = await userDB.findOne({ _id: ObjectID(id) })
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'User tidak ditemukan.' })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'User tidak ditemukan.', status: 400 })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async insert(req, res) {
+  static async insert(req, res, next) {
     try {
       const { username, nama, password } = req.body
       let role = req.body.role
@@ -52,13 +52,13 @@ class UserController {
 
       // validate input
       let validator = schema.validate({ nama, username, password })
-      if (validator.error) throw (validator.error.message)
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       let hashedPassword = makeHash(password)
 
       // check if tapel exists
       let wakelExists = await userDB.findOne({ username })
-      if (wakelExists) throw ({ msg: `Username ${username} telah digunakan.` })
+      if (wakelExists) throw ({ msg: `Username ${username} telah digunakan.`, status: 406 })
 
       if (!role) role = "admin"
 
@@ -73,12 +73,12 @@ class UserController {
       res.status(200).json({ msg: `User dengan role ${role} berhasil dibuat.` })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
 
   }
 
-  static async update(req, res) {
+  static async update(req, res, next) {
     try {
       const id = req.params.id
       const { username, nama, role } = req.body
@@ -101,7 +101,7 @@ class UserController {
 
       // validate input
       let validator = schema.validate({ nama, username })
-      if (validator.error) throw (validator.error.message)
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       await userDB.findOneAndUpdate({ _id: ObjectID(id) }, {
         $set: {
@@ -115,18 +115,18 @@ class UserController {
       res.status(200).json({ msg: `User berhasil di perbaharui.` })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     try {
       const id = req.params.id
       const data = await userDB.findOneAndDelete({ _id: ObjectID(id) })
-      if (!data.value) throw ({ msg: "User tidak ditemukan" })
+      if (!data.value) throw ({ msg: "User tidak ditemukan", status: 400 })
       res.status(200).json(data)
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 

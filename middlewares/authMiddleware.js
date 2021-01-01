@@ -18,7 +18,6 @@ async function authentication(req, res, next) {
     req.loggedInUser = user
     next()
   } catch (err) {
-    console.log(err)
     next(err)
   }
 
@@ -30,7 +29,6 @@ async function isAdmin(req, res, next) {
     if (user.role !== 'admin') throw { msg: 'Not authorized, only admin can have access', status: 403 }
     next()
   } catch (err) {
-    console.log(err)
     next(err)
   }
 }
