@@ -5,33 +5,37 @@ const tapelDb = require("../config/db").collection('tahunPelajaran')
 
 class TahunPelajaranController {
 
-  static async index(req, res) {
-    let tapels = await tapelDb.find({}).toArray()
-    res.send(tapels)
+  static async index(req, res, next) {
+    try {
+      let tapels = await tapelDb.find({}).toArray()
+      res.send(tapels)
+    } catch (err) {
+      next(err)
+    }
   }
   static async findById(req, res) {
     try {
       const id = req.params.id
       const data = await tapelDb.findOne({ _id: ObjectID(id) })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Tahun pelajaran tidak ada.' })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Tahun pelajaran tidak ada.', status: 400 })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
-  static async findByName(req, res) {
+  static async findByName(req, res, next) {
     try {
       const tapel = req.params.tapel
       const data = await tapelDb.findOne({ tapel })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Tahun pelajaran tidak ada.' })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Tahun pelajaran tidak ada.', status: 400 })
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async insert(req, res) {
+  static async insert(req, res, next) {
     try {
       const { tapel } = req.body
       // validation rules
@@ -48,22 +52,22 @@ class TahunPelajaranController {
 
       // validate input
       let validator = schema.validate({ tapel })
-      if (validator.error) throw (validator.error.message)
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       // check if tapel exists
       let tapelExist = await tapelDb.findOne({ tapel })
-      if (tapelExist) throw ({ msg: `Tahun pelajaran ${tapel} sudah ada dalam database` })
+      if (tapelExist) throw ({ msg: `Tahun pelajaran ${tapel} sudah ada dalam database`, status: 400 })
 
       await tapelDb.insertOne({ tapel })
       res.status(200).json({ msg: "Tahun pelajaran berhasil di simpan" })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
 
   }
 
-  static async update(req, res) {
+  static async update(req, res, next) {
     try {
       const id = req.params.id
       const { tapel } = req.body
@@ -81,28 +85,28 @@ class TahunPelajaranController {
 
       // validate input
       let validator = schema.validate({ tapel })
-      if (validator.error) throw (validator.error.message)
+      if (validator.error) throw ({ msg: validator.error.message, status: 400 })
 
       // check if tapel exists
       let tapelExist = await tapelDb.findOne({ tapel })
-      if (tapelExist) throw ({ msg: `Tahun pelajaran ${tapel} sudah ada dalam database` })
+      if (tapelExist) throw ({ msg: `Tahun pelajaran ${tapel} sudah ada dalam database`, status: 400 })
 
       await tapelDb.updateOne({ _id: ObjectID(id) }, { $set: { tapel } })
       res.status(200).json({ msg: "Tahun pelajaran berhasil di update" })
 
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 
-  static async delete(req, res) {
+  static async delete(req, res, next) {
     try {
       const id = req.params.id
-      const data = await tapelDb.findOneAndDelete({_id: ObjectID(id)})
-      if(!data.value) throw ({msg : "Tapel tidak ditemukan"})
+      const data = await tapelDb.findOneAndDelete({ _id: ObjectID(id) })
+      if (!data.value) throw ({ msg: "Tapel tidak ditemukan", status: 400 })
       res.send(data)
     } catch (err) {
-      console.log(err);
+      next(err)
     }
   }
 

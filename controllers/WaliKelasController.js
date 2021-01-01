@@ -19,7 +19,7 @@ class WaliKelasController {
       const id = req.params.id
       const data = await wakelDB.findOne({ _id: ObjectID(id) })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Wali kelas tidak ditemukan.', status: 400 })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Wali kelas tidak ditemukan.', status: 400 })
 
     } catch (err) {
       next(err)
@@ -31,7 +31,7 @@ class WaliKelasController {
       const { nama } = req.params
       const data = await wakelDB.findOne({ nama })
 
-      data ? res.status(200).json(data) : res.status(500).json({ err: 'Walikelas tidak ditemukan.', status: 400 })
+      data ? res.status(200).json(data) : res.status(500).json({ msg: 'Walikelas tidak ditemukan.', status: 400 })
     } catch (err) {
       next(err)
     }
