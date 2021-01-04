@@ -9,9 +9,10 @@ class AuthController {
     try {
       const { username, password } = req.body
       const user = await users.findOne({ username })
+      if (!user) throw { msg: "Username/password salah", status: 400 }
       const passwordMatch = compareHash(password, user.password)
       // throw error jika username tidak ditemukan atau username ditemukan namun password salah
-      if (!user || !passwordMatch) throw { msg: "Username/password salah", status: 400 }
+      if (!passwordMatch) throw { msg: "Username/password salah", status: 400 }
 
       // Jika kedua nya cocok, buatkan jwt token untuk client
       const token = signToken({
