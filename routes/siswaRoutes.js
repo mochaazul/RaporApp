@@ -1,7 +1,6 @@
 const express = require('express')
-const ImportController = require('../controllers/ImportController')
+const SiswaController = require('../controllers/SiswaController')
 const siswaRoutes = express.Router()
 
-siswaRoutes.post("/import", ImportController.importSiswa)
-
+siswaRoutes.get("/",SiswaController.index)
 module.exports = siswaRoutes
