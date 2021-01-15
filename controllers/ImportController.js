@@ -28,7 +28,7 @@ class ImportController {
       //     }
       //   })
       // }
-
+      console.log(req.file);
       let siswa = db.collection('siswa')
       let sheet = XLSX.readFile(req.file.path)
       let SheetNames = sheet.SheetNames[0]
